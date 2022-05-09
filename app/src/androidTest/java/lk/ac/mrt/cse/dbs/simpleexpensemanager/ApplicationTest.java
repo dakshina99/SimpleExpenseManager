@@ -16,14 +16,54 @@
 
 package lk.ac.mrt.cse.dbs.simpleexpensemanager;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import android.content.Context;
+
+import androidx.test.core.app.ApplicationProvider;
+
+import org.junit.Test;
+import org.junit.BeforeClass;
+
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.ExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.PersistentDemoExpenseManager;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.control.exception.ExpenseManagerException;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.exception.InvalidAccountException;
+import lk.ac.mrt.cse.dbs.simpleexpensemanager.data.model.ExpenseType;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
+public class ApplicationTest {
+    private static ExpenseManager testExpenceManager;
+
+
+    @BeforeClass
+    public static void setupClient() {
+        try{
+            Context cont = ApplicationProvider.getApplicationContext();
+            testExpenceManager = new PersistentDemoExpenseManager(cont);
+        }catch (ExpenseManagerException e){ }
     }
+
+    @Test
+    public void testAddAccount(){
+        testExpenceManager.addAccount("404a", "Bank X", "peter parker", 1000.0);
+        assertTrue(testExpenceManager.getAccountNumbersList().contains("404a"));
+    }
+
+    @Test
+    public void testAddExpence(){
+        try{
+            int sizeOfLogsArr = testExpenceManager.getTransactionLogs().size();
+            testExpenceManager.updateAccountBalance("12345A",10, 5, 2022, ExpenseType.EXPENSE, "500");
+            assertEquals(testExpenceManager.getTransactionLogs().size() , sizeOfLogsArr + 1);
+        }catch (InvalidAccountException e){
+
+        }
+
+    }
+
+
 }
